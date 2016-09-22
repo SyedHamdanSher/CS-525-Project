@@ -18,10 +18,27 @@ void initStorageManager(void) { //initialize Storage manager
 }
 
 RC createPageFile(char * fileName) { //create Page, the totalNumPages has to be initialized based on the file size.
-//Create a new page file fileName. The initial file size should be one page. This method should fill this single page with '\0' bytes.	
+//Create a new page file fileName. The initial file size should be one page. This method should fill this single page with '\0' bytes.
 }
-RC openPageFile(char *fileName, SM_FileHandle *fHandle) { //opening a file, the current page should be the first page in the file (curPagePos=0)
-//Opens an existing page file. Should return RC_FILE_NOT_FOUND if the file does not exist. The second parameter is an existing file handle. If opening the file is successful, then the fields of this file handle should be initialized with the information about the opened file. For instance, you would have to read the total number of pages that are stored in the file from disk.
+RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
+    FILE *pfile;
+
+    pfile = fopen(fileName, "r");
+    if (pfile == NULL)
+    {
+        return RC_FILE_NOT_FOUND;
+    }
+    else
+    {
+        fHandle->fileName = fileName;
+        fHandle->mgmtInfo = pfile;
+        fHandle->totalNumPages = 1;
+        fHandle->curPagePos = 0;
+        fseek(pfile, 0, SEEK_SET);
+        fwrite(fileName,PAGE_SIZE,0,pfile);
+        fclose(pfile);
+        return RC_OK;
+    }
 }
 
 RC closePageFile (SM_FileHandle *fHandle) {
@@ -37,7 +54,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A p
 }
 
 int getBlockPos (SM_FileHandle *fHandle) {
-//Return the current page position in a file 
+//Return the current page position in a file
 }
 
 RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
@@ -72,4 +89,3 @@ RC appendEmptyBlock (SM_FileHandle *fHandle) {
 RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
 //If the file has less than numberOfPages pages then increase the size to numberOfPages.
 }
-
