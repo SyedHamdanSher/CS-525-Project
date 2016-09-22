@@ -12,53 +12,64 @@
 /* manipulating page files */
 
 void initStorageManager(void) { //initialize Storage manager
-
+//he mgmtInfo to store additional information about the file needed by your implementation, e.g., a POSIX file descriptor mgmtInfo to store any bookkeeping info about a file your storage manager needs.
+	//the totalNumPages has to be initialized based on the file size.
+	//reserve some space in the beginning of a file to store information such as the total number of pages.
 }
 
-RC createPageFile(char * fileName) { //create Page
-
+RC createPageFile(char * fileName) { //create Page, the totalNumPages has to be initialized based on the file size.
+//Create a new page file fileName. The initial file size should be one page. This method should fill this single page with '\0' bytes.	
 }
-RC openPageFile(char *fileName, SM_FileHandle *fHandle) {
-
+RC openPageFile(char *fileName, SM_FileHandle *fHandle) { //opening a file, the current page should be the first page in the file (curPagePos=0)
+//Opens an existing page file. Should return RC_FILE_NOT_FOUND if the file does not exist. The second parameter is an existing file handle. If opening the file is successful, then the fields of this file handle should be initialized with the information about the opened file. For instance, you would have to read the total number of pages that are stored in the file from disk.
 }
 
 RC closePageFile (SM_FileHandle *fHandle) {
-
+//Close an open page file or destroy (delete) a page file.
 }
 
 RC destroyPageFile (char *fileName) {
 
 }
 
-RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
-
+RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A page handle is an pointer to an area in memory storing the data of a page
+//The method reads the pageNumth block from a file and stores its content in the memory pointed to by the memPage page handle. If the file has less than pageNum pages, the method should return RC_READ_NON_EXISTING_PAGE.
 }
 
 int getBlockPos (SM_FileHandle *fHandle) {
-
+//Return the current page position in a file 
 }
 
 RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
-
+//Read the first respective last page in a file
 }
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
-
+//Read the current, previous, or next page relative to the curPagePos of the file. The curPagePos should be moved to the page that was read. If the user tries to read a block before the first page of after the last page of the file, the method should return RC_READ_NON_EXISTING_PAGE
 }
-RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) { // readCurrentBlock reads the curPagePosth page counted from the beginning of the file.
 
 }
 RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 
 }
 RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
-
+//Read the first respective last page in a file
 }
 
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
+//Write a page to disk using either the current position or an absolute position.
+}
+
+RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+////Write a page to disk using either the current position or an absolute position.
 
 }
 
-RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
+RC appendEmptyBlock (SM_FileHandle *fHandle) {
+//Increase the number of pages in the file by one. The new last page should be filled with zero bytes.
+}
 
+RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
+//If the file has less than numberOfPages pages then increase the size to numberOfPages.
 }
 
