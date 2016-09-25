@@ -11,19 +11,30 @@
 
 /* manipulating page files */
 
-void initStorageManager(void) { //initialize Storage manager
-//he mgmtInfo to store additional information about the file needed by your implementation, e.g., a POSIX file descriptor mgmtInfo to store any bookkeeping info about a file your storage manager needs.
-	//the totalNumPages has to be initialized based on the file size.
-	//reserve some space in the beginning of a file to store information such as the total number of pages.
+//This functions intializes the Storage Manager. Returns void
+void initStorageManager(void){
+
 }
 
-RC createPageFile(char * fileName) { //create Page, the totalNumPages has to be initialized based on the file size.
-//Create a new page file fileName. The initial file size should be one page. This method should fill this single page with '\0' bytes.
+//This creates a pagefile and intializes a memory allocation using calloc
+RC createPageFile (char *fileName) {
+
+    FILE *pfile;
+    char *initialize;
+    initialize = (char*) calloc(PAGE_SIZE, sizeof(char));
+
+    pfile = fopen(fileName, "wb+");
+    fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
+    fclose(pfile);
+    free(initialize);
+    return RC_OK;
+
 }
+
 RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     FILE *pfile;
 
-    pfile = fopen(fileName, "r");
+    pfile = fopen(fileName, "rb");
     if (pfile == NULL)
     {
         return RC_FILE_NOT_FOUND;
@@ -41,11 +52,33 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     }
 }
 
-RC closePageFile (SM_FileHandle *fHandle) {
-//Close an open page file or destroy (delete) a page file.
-}
 
-RC destroyPageFile (char *fileName) {
+
+RC closePageFile (SM_FileHandle *fHandle){
+    FILE *pfile;
+    pfile = fopen(fHandle ->fileName, "rb");
+    if (pfile == NULL){
+        return RC_FILE_NOT_FOUND;
+    }
+    else{
+        fclose(pfile);
+        return RC_OK;
+    }
+
+}
+//This function destroys a file. It first checks if the file exists.
+RC destroyPageFile (char *fileName){
+    int file_existence = access(fileName, F_OK);
+    if (file_existence == 0){
+        //if 0, file exists, so we destroy it
+        remove(fileName);
+        return RC_OK;
+
+    }
+    else
+    {
+        return RC_FILE_NOT_FOUND;
+    }
 
 }
 
