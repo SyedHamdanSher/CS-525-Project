@@ -108,17 +108,82 @@ RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
 //Write a page to disk using either the current position or an absolute position.
+	FILE *pfile;
+	//int flag;
+	pfile = fopen(fHandle->fileName, "wb+");
+	if(pfile != NULL){
+		fseek(pfile,(PAGE_SIZE * pageNum),SEEK_SET);
+		/*flag = */fwrite(memPage, sizeof(char), PAGE_SIZE, pfile);
+		fHandle->curPagePos=pageNum;
+		fHandle->mgmtInfo = pfile;
+		fclose(pfile);
+		return RC_OK;
+	}
+	else{
+		return RC_FILE_NOT_FOUND;
+	}
 }
 
 RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 ////Write a page to disk using either the current position or an absolute position.
-
+	int pos; 
+	pos = getBlockPos(fHandle->curPagePos);
+	RC flag;
+	flag = writeBlock(pos, fHandle, memPage);
+	return flag;
 }
 
 RC appendEmptyBlock (SM_FileHandle *fHandle) {
 //Increase the number of pages in the file by one. The new last page should be filled with zero bytes.
+	FILE *pfile;
+    
+    pfile = fopen(fHandle->fileName, "wb+");
+    if(pfile!=NULL)
+    {
+    	char *initialize;
+    	initialize = (char*) calloc(PAGE_SIZE, sizeof(char));
+    	fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
+    	//
+    	fHandle->mgmtInfo = pfile;
+       	fHandle->totalNumPages = fHandle->totalNumPages + 1;
+       	fHandle->curPagePos = fHandle->totalNumPages-1;
+    	//
+    	fclose(pfile);
+    	free(initialize);
+    	return RC_OK;
+	}
+	else
+	{
+		fclose(pfile);
+		return RC_FILE_NOT_FOUND;
+	}
 }
 
 RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
 //If the file has less than numberOfPages pages then increase the size to numberOfPages.
+	if (fHandle->fileName == NULL){
+		return RC_FILE_NOT_FOUND;
+	}
+	else{
+		if (fHandle->totalNumPages < numOfPages){
+			FILE *pfile;
+			pfile = fHandle->mgmtInfo;
+			int flag;
+			flag = (numOfPages - fHandle->totalNumPages);
+			SM_PageHandle ph;
+			ph = (SM_PageHandle) malloc(PAGE_SIZE);
+			memset(ph,'0',(flag*PAGE_SIZE));
+    		fwrite(ph,sizeof(char),(flag*PAGE_SIZE),pfile);
+            int n;
+            n = fseek(pfile,0, SEEK_END);
+			fHandle->curPagePos = n + 1;
+			fHandle->totalNumPages = numOfPages;
+			fHandle->mgmtInfo = pfile;
+			fclose(pfile);
+			free(ph);
+		}
+		else{
+			perror("TotalNumber of PAges >= number of pages provided");
+		}
+	}return RC_OK;
 }
