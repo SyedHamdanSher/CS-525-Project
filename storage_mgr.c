@@ -84,26 +84,77 @@ RC destroyPageFile (char *fileName){
 
 RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A page handle is an pointer to an area in memory storing the data of a page
 //The method reads the pageNumth block from a file and stores its content in the memory pointed to by the memPage page handle. If the file has less than pageNum pages, the method should return RC_READ_NON_EXISTING_PAGE.
+	
+	//Open the File using "Read" mode
+	pfile = fopen(fHandle->fileName, "r");
+	
+
+	// Check if the number of pages in the file are less than pageNum pages. If so, return non-existing page error
+	if(pageNum > fHandle->totalNumPages || pageNum<0){
+		fclose(pfile);
+		return RC_READ_NON_EXISTING_PAGE;
+	}
+
+	//Check if the file pointer is null
+	if(pfile == NULL){
+		return RC_FILE_NOT_FOUND;
+	}
+	//Find position of the stream
+	fseek(pfile, (pageNum*PAGE_SIZE), SEEK_SET);
+
+	//Return an error if the total memory size required is less than the page size to be read
+	if(fread(memPage, 1, PAGE_SIZE,pfile)< PAGE_SIZE){
+		return RC_ERROR;
+	}
+
+	//The position of the current page in the structure file handle has to be updated with the latest pointer position
+	fHandle->curPagePos = ftell(pfile);
+
+	fclose(pfile);
+	//Return OK after closing the file indicating that the file is read
+	return RC_OK;
+
 }
+
+
 
 int getBlockPos (SM_FileHandle *fHandle) {
 //Return the current page position in a file
+	return fHandle->curPagePos;
 }
 
 RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+
 //Read the first respective last page in a file
+	return readBlock(0,fHandle,memPage);
+
 }
-RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+
 //Read the current, previous, or next page relative to the curPagePos of the file. The curPagePos should be moved to the page that was read. If the user tries to read a block before the first page of after the last page of the file, the method should return RC_READ_NON_EXISTING_PAGE
-}
-RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) { // readCurrentBlock reads the curPagePosth page counted from the beginning of the file.
+RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+	
+	return readBlock(fHandle->curPagePos-1,fHandle,memPage);
 
 }
-RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+
+// readCurrentBlock reads the curPagePosth page counted from the beginning of the file.
+RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){ 
+	
+	return readBlock(fHandle->curPagePos, fHandle,memPage);
+}
+
+//
+RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	
+	return readBlock(fHandle->curPagePos+1,fHandle,memPage);
 
 }
-RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+
 //Read the first respective last page in a file
+RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	
+	return readBlock(fHandle->totalNumPages,fHandle,memPage);
+
 }
 
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
