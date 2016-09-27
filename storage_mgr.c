@@ -19,10 +19,11 @@ void initStorageManager(void){
 RC createPageFile (char *fileName) {
 
     FILE *pfile;
-    char *initialize;
-    initialize = (char*) calloc(PAGE_SIZE, sizeof(char));
+    SM_PageHandle initialize;
+    initialize = (SM_PageHandle) calloc(PAGE_SIZE, sizeof(char));
 
     pfile = fopen(fileName, "wb+");
+    memset(initialize,'\0',PAGE_SIZE);
     fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
     fclose(pfile);
     free(initialize);
@@ -32,20 +33,29 @@ RC createPageFile (char *fileName) {
 //Opens an existing page file,fields of this file handle should be initialized with the information about the opened file.
 RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     FILE *pfile;
+    int len,*flag;
+    flag = (int*)malloc(sizeof(int));
 
-    pfile = fopen(fileName, "rb");
+    pfile = fopen(fileName, "rb+");
     if (pfile == NULL)
     {
         return RC_FILE_NOT_FOUND;
+        fclose(pfile);
     }
     else
     {
         fHandle->fileName = fileName;
         fHandle->mgmtInfo = pfile;
-        fHandle->totalNumPages = 1;
-        fHandle->curPagePos = 0;
+        fseek(pfile, 0, SEEK_END);
+        len = ftell(pfile);
+
+        fHandle->totalNumPages = (int)(len/PAGE_SIZE);
         fseek(pfile, 0, SEEK_SET);
-        fwrite(fileName,PAGE_SIZE,0,pfile);
+        fHandle->curPagePos = 0;
+        fwrite(fileName,sizeof(char),sizeof(fileName),pfile);
+        fseek(pfile, sizeof(fileName), SEEK_SET);
+        *flag = fHandle->totalNumPages;
+        fwrite(flag,sizeof(int),1,pfile);
         fclose(pfile);
         return RC_OK;
     }
@@ -230,7 +240,7 @@ RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
 			free(ph);
 		}
 		else{
-			perror("TotalNumber of PAges >= number of pages provided");
+				return RC_TOTALNUMPAGES_GREATEROREQUALTO_NUMOFPAGES;
 		}
 	}return RC_OK;
 }
