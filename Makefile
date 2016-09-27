@@ -2,6 +2,7 @@ TOKEN = -g -Wall
 COMP = gcc
 
 
+
 default: test_1
 
 
@@ -23,4 +24,3 @@ test_1: test_assign1_1.o storage_mgr.o dberror.o
 
 garbage:
 	rm test_1 test_assign1_1.o storage_mgr.o dberror.o
-	
