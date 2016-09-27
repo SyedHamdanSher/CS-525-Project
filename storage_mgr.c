@@ -191,17 +191,15 @@ RC appendEmptyBlock (SM_FileHandle *fHandle) {
     pfile = fopen(fHandle->fileName, "wb+");
     if(pfile!=NULL)
     {
-    	char *initialize;
-    	initialize = (char*) calloc(PAGE_SIZE, sizeof(char));
-    	fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
+    	RC flag;
+    	flag = createPageFile(fHandle->fileName);
     	//
     	fHandle->mgmtInfo = pfile;
        	fHandle->totalNumPages = fHandle->totalNumPages + 1;
        	fHandle->curPagePos = fHandle->totalNumPages-1;
     	//
     	fclose(pfile);
-    	free(initialize);
-    	return RC_OK;
+    	return flag;
 	}
 	else
 	{
