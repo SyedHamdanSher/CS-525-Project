@@ -1,0 +1,34 @@
+TOKEN = -g -Wall
+COMP = gcc
+
+
+default: test_assign1_1
+
+
+dberror.o: dberror.c
+	$(COMP) $(TOKEN) -o dberror.o -c dberror.c
+	
+
+storage_mgr.o: storage_mgr.c
+	$(COMP) $(TOKEN) -o storage_mgr.o -c storage_mgr.c
+
+
+test_assign1_1.o: test_assign1_1.c
+	$(COMP) $(TOKEN) -o test_assign1_1.o -c test_assign1_1.c
+
+
+test_assign1_2.o: test_assign1_2.c
+	$(COMP) $(TOKEN) -o test_assign1_2.o -c test_assign1_2.c
+
+
+test_1: test_assign1_1.o storage_mgr.o dberror.o
+	$(COMP) $(TOKEN) -o test_1 test_assign1_1.o storage_mgr.o dberror.o 
+
+	
+test_2: test_assign1_2.o storage_mgr.o dberror.o
+	$(COMP) $(TOKEN) -o test_2 test_assign1_2.o storage_mgr.o dberror.o
+
+
+garbage:
+	rm test_1 test_2 test_assign1_1.o test_assign1_2.o storage_mgr.o dberror.o
+	
