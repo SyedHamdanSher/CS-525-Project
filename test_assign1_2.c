@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "storage_mgr.h"
+#include "STORAGE_MGR_H.h"
 #include "dberror.h"
 #include "test_helper.h"
 
