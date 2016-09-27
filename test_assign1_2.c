@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "storage_mgr.h"
+#include "STORAGE_MGR_H.h"
 #include "dberror.h"
 #include "test_helper.h"
 
@@ -24,7 +24,7 @@ int
 main (void)
 {
   testName = "";
-  
+
   initStorageManager();
 
   testLastFewFunc();
@@ -36,6 +36,7 @@ main (void)
 //checking whether some function works as individual functions
 void testLastFewFunc(void)
 {
+  int i;
   SM_FileHandle fh;
   SM_PageHandle ph,xh;
   testName = "test empty space file";
@@ -66,7 +67,7 @@ void testLastFewFunc(void)
     fh->mgmtInfo = pfile;
     fclose(pfile);
     printf("writing second block with SIZE less than PAGE_SIZE\n"); */
-  
+
 
   //If the file has less than numberOfPages pages then increase the size to numberOfPages.
   TEST_CHECK(ensureCapacity(2, &fh));
