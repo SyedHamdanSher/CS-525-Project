@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "SRORAGE_MGR_H.h"
+#include "STORAGE_MGR_H.h"
 #include "dberror.h"
 
 /* manipulating page files */
