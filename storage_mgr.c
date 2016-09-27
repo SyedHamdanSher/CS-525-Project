@@ -83,7 +83,7 @@ RC destroyPageFile (char *fileName){
 
 RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A page handle is an pointer to an area in memory storing the data of a page
 //The method reads the pageNumth block from a file and stores its content in the memory pointed to by the memPage page handle. If the file has less than pageNum pages, the method should return RC_READ_NON_EXISTING_PAGE.
-	File *pfile;
+	FILE *pfile;
 	//Open the File using "Read" mode
 	pfile = fopen(fHandle->fileName, "r");
 	
