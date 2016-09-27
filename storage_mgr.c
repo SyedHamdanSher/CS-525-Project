@@ -23,7 +23,7 @@ RC createPageFile (char *fileName) {
     initialize = (SM_PageHandle) calloc(PAGE_SIZE, sizeof(char));
 
     pfile = fopen(fileName, "wb+");
-    memset(initialize,'\0',PAGE_SIZE);
+    //memset(initialize,'\0',PAGE_SIZE);
     fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
     fclose(pfile);
     free(initialize);
@@ -33,14 +33,16 @@ RC createPageFile (char *fileName) {
 //Opens an existing page file,fields of this file handle should be initialized with the information about the opened file.
 RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     FILE *pfile;
-    int len,*flag;
+    int *flag;
+    long len;
     flag = (int*)malloc(sizeof(int));
 
     pfile = fopen(fileName, "rb+");
     if (pfile == NULL)
     {
-        return RC_FILE_NOT_FOUND;
         fclose(pfile);
+        return RC_FILE_NOT_FOUND;
+
     }
     else
     {
@@ -50,19 +52,19 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
         len = ftell(pfile);
 
         fHandle->totalNumPages = (int)(len/PAGE_SIZE);
-        fseek(pfile, 0, SEEK_SET);
+        //fseek(pfile, PAGE_SIZE, SEEK_SET);
         fHandle->curPagePos = 0;
-        fwrite(fileName,sizeof(char),sizeof(fileName),pfile);
-        fseek(pfile, sizeof(fileName), SEEK_SET);
-        *flag = fHandle->totalNumPages;
-        fwrite(flag,sizeof(int),1,pfile);
+        //fwrite(fileName,sizeof(char),sizeof(fileName),pfile);
+        //fseek(pfile, sizeof(fileName), SEEK_SET);
+        //*flag = fHandle->totalNumPages;
+        //fwrite(flag,sizeof(int),1,pfile);
         fclose(pfile);
         return RC_OK;
     }
 }
 
 
-//Close an open page file 
+//Close an open page file
 RC closePageFile (SM_FileHandle *fHandle){
     FILE *pfile;
     pfile = fopen(fHandle ->fileName, "rb");
@@ -96,7 +98,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A p
 	FILE *pfile;
 	//Open the File using "Read" mode
 	pfile = fopen(fHandle->fileName, "r");
-	
+
 
 	// Check if the number of pages in the file are less than pageNum pages. If so, return non-existing page error
 	if(pageNum > fHandle->totalNumPages || pageNum<0){
@@ -117,7 +119,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A p
 	}
 
 	//The position of the current page in the structure file handle has to be updated with the latest pointer position
-	fHandle->curPagePos = ftell(pfile);
+	fHandle->curPagePos = (int) ftell(pfile);
 
 	fclose(pfile);
 	//Return OK after closing the file indicating that the file is read
@@ -141,27 +143,27 @@ RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 
 //Read the previous page relative to the curPagePos of the file. The curPagePos should be moved to the page that was read. If the user tries to read a block before the first page of after the last page of the file, the method should return RC_READ_NON_EXISTING_PAGE
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
-	
+
 	return readBlock(fHandle->curPagePos-1,fHandle,memPage);
 
 }
 
 // readCurrentBlock reads the curPagePosth page counted from the beginning of the file.
-RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){ 
-	
+RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+
 	return readBlock(fHandle->curPagePos, fHandle,memPage);
 }
 
 //Read the next page relative to the curPagePos of the file
 RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
-	
+
 	return readBlock(fHandle->curPagePos+1,fHandle,memPage);
 
 }
 
 //Read the first respective last page in a file
 RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
-	
+
 	return readBlock(fHandle->totalNumPages,fHandle,memPage);
 
 }
@@ -185,7 +187,7 @@ RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
 
 RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 ////Write a page to disk using either the current position or an absolute position.
-	int pos; 
+	int pos;
 	pos = getBlockPos(fHandle);
 	RC flag;
 	flag = writeBlock(pos, fHandle, memPage);
@@ -195,7 +197,7 @@ RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 RC appendEmptyBlock (SM_FileHandle *fHandle) {
 //Increase the number of pages in the file by one. The new last page should be filled with zero bytes.
 	FILE *pfile;
-    
+
     pfile = fopen(fHandle->fileName, "wb+");
     if(pfile!=NULL)
     {
@@ -229,7 +231,7 @@ RC ensureCapacity(int numOfPages, SM_FileHandle *fHandle) {
 			flag = (numOfPages - fHandle->totalNumPages);
 			SM_PageHandle ph;
 			ph = (SM_PageHandle) malloc(PAGE_SIZE);
-			memset(ph,'0',(flag*PAGE_SIZE));
+			memset(ph,'\0',(flag*PAGE_SIZE));
     		fwrite(ph,sizeof(char),(flag*PAGE_SIZE),pfile);
             int n;
             n = fseek(pfile,0, SEEK_END);
