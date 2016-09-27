@@ -29,7 +29,7 @@ RC createPageFile (char *fileName) {
     return RC_OK;
 
 }
-
+//Opens an existing page file,fields of this file handle should be initialized with the information about the opened file.
 RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     FILE *pfile;
 
@@ -52,7 +52,7 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
 }
 
 
-
+//Close an open page file 
 RC closePageFile (SM_FileHandle *fHandle){
     FILE *pfile;
     pfile = fopen(fHandle ->fileName, "rb");
@@ -129,7 +129,7 @@ RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 
 }
 
-//Read the current, previous, or next page relative to the curPagePos of the file. The curPagePos should be moved to the page that was read. If the user tries to read a block before the first page of after the last page of the file, the method should return RC_READ_NON_EXISTING_PAGE
+//Read the previous page relative to the curPagePos of the file. The curPagePos should be moved to the page that was read. If the user tries to read a block before the first page of after the last page of the file, the method should return RC_READ_NON_EXISTING_PAGE
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 	
 	return readBlock(fHandle->curPagePos-1,fHandle,memPage);
@@ -142,7 +142,7 @@ RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 	return readBlock(fHandle->curPagePos, fHandle,memPage);
 }
 
-//
+//Read the next page relative to the curPagePos of the file
 RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 	
 	return readBlock(fHandle->curPagePos+1,fHandle,memPage);
@@ -159,11 +159,10 @@ RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
 //Write a page to disk using either the current position or an absolute position.
 	FILE *pfile;
-	//int flag;
 	pfile = fopen(fHandle->fileName, "wb+");
 	if(pfile != NULL){
 		fseek(pfile,(PAGE_SIZE * pageNum),SEEK_SET);
-		/*flag = */fwrite(memPage, sizeof(char), PAGE_SIZE, pfile);
+		fwrite(memPage, sizeof(char), PAGE_SIZE, pfile);
 		fHandle->curPagePos=pageNum;
 		fHandle->mgmtInfo = pfile;
 		fclose(pfile);
