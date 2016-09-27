@@ -27,6 +27,7 @@ typedef int RC;
 #define RC_IM_N_TO_LAGE 302
 #define RC_IM_NO_MORE_ENTRIES 303
 #define RC_TOTALNUMPAGES_GREATEROREQUALTO_NUMOFPAGES 999
+#define RC_TOTALMEMSIZE_LESSTHAN_PAGESIZE 998
 
 /* holder for error messages */
 extern char *RC_message;

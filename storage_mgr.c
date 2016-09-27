@@ -115,7 +115,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {//A p
 
 	//Return an error if the total memory size required is less than the page size to be read
 	if(fread(memPage, 1, PAGE_SIZE,pfile)< PAGE_SIZE){
-		perror("error if the total memory size required is less than the page size to be read");
+		return RC_TOTALMEMSIZE_LESSTHAN_PAGESIZE;
 	}
 
 	//The position of the current page in the structure file handle has to be updated with the latest pointer position
