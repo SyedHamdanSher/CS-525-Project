@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "STORAGE_MGR_H.h"
+#include "storage_mgr.h"
 #include "dberror.h"
 
 /* manipulating page files */
@@ -23,13 +23,13 @@ RC createPageFile (char *fileName) {
     initialize = (SM_PageHandle) calloc(PAGE_SIZE, sizeof(char));
 
     pfile = fopen(fileName, "wb+");
-    //memset(initialize,'\0',PAGE_SIZE);
     fwrite(initialize,sizeof(char),PAGE_SIZE,pfile);
     fclose(pfile);
     free(initialize);
     return RC_OK;
 
 }
+
 //Opens an existing page file,fields of this file handle should be initialized with the information about the opened file.
 RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
     FILE *pfile;
@@ -50,14 +50,8 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
         fHandle->mgmtInfo = pfile;
         fseek(pfile, 0, SEEK_END);
         len = ftell(pfile);
-
         fHandle->totalNumPages = (int)(len/PAGE_SIZE);
-        //fseek(pfile, PAGE_SIZE, SEEK_SET);
         fHandle->curPagePos = 0;
-        //fwrite(fileName,sizeof(char),sizeof(fileName),pfile);
-        //fseek(pfile, sizeof(fileName), SEEK_SET);
-        //*flag = fHandle->totalNumPages;
-        //fwrite(flag,sizeof(int),1,pfile);
         fclose(pfile);
         return RC_OK;
     }
